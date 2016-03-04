@@ -1,4 +1,4 @@
-# WrapHH [![GoDoc](https://godoc.org/github.com/turtlemonvh/gin-wraphh?status.svg)](https://godoc.org/github.com/turtlemonvh/gin-wraphh)
+# WrapHH [![GoDoc](https://godoc.org/github.com/turtlemonvh/gin-wraphh?status.svg)](https://godoc.org/github.com/turtlemonvh/gin-wraphh) [![Build Status](https://travis-ci.org/turtlemonvh/gin-wraphh.png?branch=master)](https://travis-ci.org/turtlemonvh/gin-wraphh)
 
 Use this to wrap middleware that accepts and returns `http.Handler` objects for use in gin.
 
