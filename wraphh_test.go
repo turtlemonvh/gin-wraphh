@@ -14,30 +14,48 @@ import (
 
 	// Example complex middlewares
 	gzipmiddle "github.com/NYTimes/gziphandler"
+	"github.com/justinas/nosurf"
 )
 
 const (
 	testResponse = "cat cat cat cat cat cat cat cat "
 )
 
-func newServer() *gin.Engine {
+var middlewareOptions = make(map[string]func(http.Handler) http.Handler)
+
+func init() {
+	middlewareOptions["gzip"] = gzipmiddle.GzipHandler
+	middlewareOptions["nosurf"] = nosurf.NewPure
+}
+
+func newServer(mo string) *gin.Engine {
 	router := gin.Default()
-	router.Use(WrapHH(gzipmiddle.GzipHandler))
+
+	if middlewareOptions[mo] != nil {
+		router.Use(WrapHH(middlewareOptions[mo]))
+	}
+
 	router.GET("/", func(c *gin.Context) {
 		c.Header("Content-Length", strconv.Itoa(len(testResponse)))
 		c.String(200, testResponse)
 	})
+
+	router.POST("/", func(c *gin.Context) {
+		c.Header("Content-Length", strconv.Itoa(len(testResponse)))
+		c.String(200, testResponse)
+	})
+
 	return router
 }
 
 // Based off:
 // https://github.com/gin-gonic/contrib/blob/master/gzip/gzip_test.go
-func TestGzip(t *testing.T) {
+func TestNYTGzip(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/", nil)
 	req.Header.Add("Accept-Encoding", "gzip")
 
 	w := httptest.NewRecorder()
-	r := newServer()
+	r := newServer("gzip")
 	r.ServeHTTP(w, req)
 
 	assert.Equal(t, w.Code, 200)
@@ -55,5 +73,24 @@ func TestGzip(t *testing.T) {
 	assert.Equal(t, string(body), testResponse)
 }
 
-// NEXT: NoSurf
-// https://github.com/justinas/nosurf/blob/master/handler.go#L93
+// Should return a 400 because CSRF token is mising for POST request
+func TestNoSurf(t *testing.T) {
+	req, _ := http.NewRequest("POST", "/", nil)
+
+	w := httptest.NewRecorder()
+	r := newServer("nosurf")
+	r.ServeHTTP(w, req)
+
+	assert.Equal(t, w.Code, nosurf.FailureCode)
+}
+
+// Should return a 200
+func TestNotNoSurf(t *testing.T) {
+	req, _ := http.NewRequest("POST", "/", nil)
+
+	w := httptest.NewRecorder()
+	r := newServer("")
+	r.ServeHTTP(w, req)
+
+	assert.Equal(t, w.Code, 200)
+}
