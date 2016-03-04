@@ -1,4 +1,4 @@
-package wrap_hh
+package wraphh
 
 import (
 	"github.com/gin-gonic/gin"
