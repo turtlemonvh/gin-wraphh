@@ -1,4 +1,4 @@
-## WrapHH
+# WrapHH [![GoDoc](https://godoc.org/github.com/turtlemonvh/gin-wraphh?status.svg)](https://godoc.org/github.com/turtlemonvh/gin-wraphh)
 
 Wrap middleware that accepts and returns `http.Handler` objects for use in gin.
 
