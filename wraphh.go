@@ -1,8 +1,9 @@
 package wraphh
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 // A wrapper that turns a http.ResponseWriter into a gin.ResponseWriter, given an existing gin.ResponseWriter
@@ -10,7 +11,8 @@ import (
 // FIXME: Wrap more methods: https://golang.org/pkg/net/http/#ResponseWriter
 type wrappedResponseWriter struct {
 	gin.ResponseWriter
-	writer http.ResponseWriter
+	writer     http.ResponseWriter
+	statusCode int
 }
 
 func (w *wrappedResponseWriter) Write(data []byte) (int, error) {
@@ -21,6 +23,11 @@ func (w *wrappedResponseWriter) WriteString(s string) (n int, err error) {
 	return w.writer.Write([]byte(s))
 }
 
+func (w *wrappedResponseWriter) WriteHeader(statusCode int) {
+	w.statusCode = statusCode
+	w.writer.WriteHeader(statusCode)
+}
+
 // An http.Handler that passes on calls to downstream middlewares
 type nextRequestHandler struct {
 	c *gin.Context
@@ -28,7 +35,11 @@ type nextRequestHandler struct {
 
 // Run the next request in the middleware chain and return
 func (h *nextRequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	h.c.Writer = &wrappedResponseWriter{h.c.Writer, w}
+	h.c.Writer = &wrappedResponseWriter{
+		ResponseWriter: h.c.Writer,
+		writer:         w,
+	}
+
 	h.c.Next()
 }
 
