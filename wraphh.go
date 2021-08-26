@@ -31,6 +31,7 @@ type nextRequestHandler struct {
 // Run the next request in the middleware chain and return
 func (h *nextRequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.c.Writer = &wrappedResponseWriter{h.c.Writer, w}
+	h.c.Request = r
 	h.c.Next()
 	h.isNext = true
 }
