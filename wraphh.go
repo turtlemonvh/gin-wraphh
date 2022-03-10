@@ -3,6 +3,7 @@ package wraphh
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"io"
 )
 
 // A wrapper that turns a http.ResponseWriter into a gin.ResponseWriter, given an existing gin.ResponseWriter
