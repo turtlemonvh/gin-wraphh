@@ -18,7 +18,7 @@ func (w *wrappedResponseWriter) Write(data []byte) (int, error) {
 }
 
 func (w *wrappedResponseWriter) WriteString(s string) (n int, err error) {
-	return w.writer.Write([]byte(s))
+	return io.WriteString(w.writer, s)
 }
 
 // An http.Handler that passes on calls to downstream middlewares
