@@ -3,6 +3,7 @@ package wraphh
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"io"
 )
 
 // A wrapper that turns a http.ResponseWriter into a gin.ResponseWriter, given an existing gin.ResponseWriter
@@ -18,7 +19,7 @@ func (w *wrappedResponseWriter) Write(data []byte) (int, error) {
 }
 
 func (w *wrappedResponseWriter) WriteString(s string) (n int, err error) {
-	return w.writer.Write([]byte(s))
+	return io.WriteString(w.writer, s)
 }
 
 // An http.Handler that passes on calls to downstream middlewares
