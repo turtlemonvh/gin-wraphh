@@ -41,5 +41,6 @@ func WrapHH(hh func(h http.Handler) http.Handler) gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 		hh(&nextRequestHandler{c}).ServeHTTP(c.Writer, c.Request)
+		c.Abort()
 	}
 }
